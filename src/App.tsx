@@ -22,13 +22,13 @@ function App() {
             <Routes>
               {/* Rutas públicas */}
               <Route element={<PublicRoute />}>
-                <Route path="/login" element={<Login />} />
+                <Route path="/family/login" element={<Login />} />
               </Route>
 
               {/* Rutas protegidas */}
               <Route element={<ProtectedRoute />}>
                 <Route
-                  path="/"
+                  path="/family"
                   element={
                     <Layout>
                       <Dashboard />
@@ -37,7 +37,7 @@ function App() {
                 />
                 {/* Añade más rutas protegidas aquí */}
                 <Route
-                  path="/chat/grupo"
+                  path="/family/chat/grupo"
                   element={
                     <Layout>
                       <ChatGrupo />
@@ -45,7 +45,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/chat/:userId"
+                  path="/family/chat/:userId"
                   element={
                     <Layout>
                       <ChatPage />

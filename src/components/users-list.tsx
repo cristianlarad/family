@@ -77,11 +77,11 @@ export const UsersList: React.FC = () => {
   }, [currentUser]);
 
   const handleStartChat = (userId: string) => {
-    navigate(`/chat/${userId}`);
+    navigate(`/family/chat/${userId}`);
   };
 
   const handleStartChatGrupo = () => {
-    navigate(`/chat/grupo`);
+    navigate(`/family/chat/grupo`);
   };
 
   if (loading) {
