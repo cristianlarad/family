@@ -1,12 +1,9 @@
-"use client";
-
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import supabase from "@/database/supabaseClient";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { SendIcon, PaperclipIcon } from "lucide-react";
 import {
   Tooltip,
@@ -44,35 +41,40 @@ const SendMessage = () => {
     setIsSending(false);
   };
 
+  useEffect(() => {
+    const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+    if (textarea) {
+      textarea.style.height = "30px";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+      if (newMessage === "") {
+        textarea.style.height = "30px";
+      }
+    }
+  }, [newMessage]);
+
   return (
     <form
       onSubmit={sendMessage}
-      className="flex bg-muted rounded-lg items-center px-2 gap-x-2"
+      className="flex bg-muted rounded-lg items-center gap-x-2"
     >
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="rounded-full text-muted-foreground hover:text-foreground"
-            >
+            <div className="rounded-full text-muted-foreground hover:text-foreground">
               <PaperclipIcon className="h-5 w-5" />
               <span className="sr-only">Adjuntar archivo</span>
-            </Button>
+            </div>
           </TooltipTrigger>
           <TooltipContent>Adjuntar archivo</TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
       <div className="relative flex-1">
-        <Input
-          type="text"
+        <textarea
           placeholder="Escribe un mensaje..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          className="pr-12 py-6  bg-muted/50 border-muted focus-visible:ring-primary/20"
+          className="bg-muted/50  w-full border-muted focus-visible:ring-primary/20"
           disabled={isSending}
         />
       </div>
