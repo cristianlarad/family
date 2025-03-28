@@ -263,7 +263,7 @@ const FetchMessages: React.FC = () => {
                               : "bg-secondary text-secondary-foreground rounded-tl-2xl rounded-tr-2xl rounded-br-2xl rounded-bl-sm"
                           }`}
                         >
-                          <p className="break-words text-sm">
+                          <p className="break-words text-sm break-all">
                             {message.content}
                           </p>
 
