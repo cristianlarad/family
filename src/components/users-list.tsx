@@ -7,6 +7,7 @@ import supabase from "@/database/supabaseClient";
 import Spinner from "./ui/Spinner";
 import { User2 } from "lucide-react";
 import avatar from "../../public/avatar.png";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export interface User {
   id: string;
@@ -22,6 +23,8 @@ export const UsersList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { isMobile, toggleSidebar } = useSidebar();
+
   useEffect(() => {
     const fetchUsers = async () => {
       if (!currentUser) {
@@ -30,7 +33,6 @@ export const UsersList: React.FC = () => {
       }
 
       try {
-        // Consulta más específica usando Supabase
         const { data, error } = await supabase.from("profiles").select("*");
 
         if (error) throw error;
@@ -46,14 +48,12 @@ export const UsersList: React.FC = () => {
 
     fetchUsers();
 
-    // Configurar suscripción en tiempo real para actualizaciones de usuarios
     const usersSubscription = supabase
       .channel("public:profiles")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "profiles" },
         (payload) => {
-          // Manejar cambios en tiempo real
           switch (payload.eventType) {
             case "INSERT":
               setUsers((prev) =>
@@ -70,17 +70,22 @@ export const UsersList: React.FC = () => {
       )
       .subscribe();
 
-    // Limpiar suscripción al desmontar
     return () => {
       supabase.removeChannel(usersSubscription);
     };
   }, [currentUser]);
 
   const handleStartChat = (userId: string) => {
+    if (isMobile) {
+      toggleSidebar();
+    }
     navigate(`/chat/${userId}`);
   };
 
   const handleStartChatGrupo = () => {
+    if (isMobile) {
+      toggleSidebar();
+    }
     navigate(`/chat/grupo`);
   };
 
