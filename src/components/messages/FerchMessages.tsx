@@ -38,22 +38,15 @@ const FetchMessages: React.FC = () => {
 
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!currentUser) return;
-
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("message")
           .select("*")
           .or(
-            `and(reciveID.eq.${currentUser.id},envioID.eq.${userId}),` +
-              `and(reciveID.eq.${userId},envioID.eq.${currentUser.id})`
+            `and(reciveID.eq.${currentUser?.id},envioID.eq.${userId}),` +
+              `and(reciveID.eq.${userId},envioID.eq.${currentUser?.id})`
           )
           .order("created_at", { ascending: true });
-
-        if (error) {
-          console.error("Error fetching messages:", error);
-          return;
-        }
 
         setMessages(data || []);
         setLoading(false);
@@ -64,28 +57,47 @@ const FetchMessages: React.FC = () => {
     };
 
     fetchMessages();
-  }, [currentUser, userId]);
+  }, [userId]);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser || !userId) return;
 
+    // Función para verificar si el mensaje es relevante
+    const isRelevantMessage = (message: Message) => {
+      return (
+        (message.reciveID === currentUser?.id && message.envioID === userId) ||
+        (message.reciveID === userId && message.envioID === currentUser?.id)
+      );
+    };
+
+    // Configurar suscripción de tiempo real
     const channel = supabase
-      .channel("message")
+      .channel("messages")
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "message",
-          filter: `reciveID=eq.${userId}`, // Filtrar solo mensajes para el usuario actual
         },
         (payload) => {
           const newMessage = payload.new as Message;
-          setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+          // Verificar si el mensaje es relevante antes de agregarlo
+          if (isRelevantMessage(newMessage)) {
+            setMessages((prevMessages) => {
+              // Evitar mensajes duplicados
+              const isDuplicate = prevMessages.some(
+                (msg) => msg.id === newMessage.id
+              );
+              return isDuplicate ? prevMessages : [...prevMessages, newMessage];
+            });
+          }
         }
       )
       .subscribe();
 
+    // Limpiar suscripción al desmontar
     return () => {
       supabase.removeChannel(channel);
     };
