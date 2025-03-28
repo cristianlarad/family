@@ -76,6 +76,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         provider: "google",
         options: {
           redirectTo: window.location.origin,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
         },
       });
 
@@ -122,11 +126,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
+
+      window.location.href = "/login";
       if (error) {
         console.error("Error de cierre de sesión:", error);
       }
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("sb-ksyihmtnrgmlqxkswbab-auth-token");
     } catch (error) {
       console.error("Error inesperado al cerrar sesión:", error);
+      window.location.href = "/login";
     } finally {
       setIsLoading(false);
     }

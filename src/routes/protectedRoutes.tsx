@@ -10,7 +10,7 @@ export const ProtectedRoute: React.FC = () => {
   }
 
   if (!user) {
-    return <Navigate to="/family/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <Outlet />; // Renderiza las rutas hijas
@@ -20,7 +20,7 @@ export const PublicRoute: React.FC = () => {
   const { user } = useAuth();
 
   if (user) {
-    return <Navigate to="/family" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
